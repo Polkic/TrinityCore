@@ -262,7 +262,7 @@ public:
 
         if (Transport* trans = chr->GetTransport())
         {
-            ObjectGuid::LowType guid = sObjectMgr->GetGenerator<HighGuid::Creature>()->Generate();
+            ObjectGuid::LowType guid = map->GenerateLowGuid<HighGuid::Creature>();
             CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
             data.id = id;
             data.phaseMask = chr->GetPhaseMask();
@@ -280,7 +280,7 @@ public:
         }
 
         Creature* creature = new Creature();
-        if (!creature->Create(sObjectMgr->GetGenerator<HighGuid::Creature>()->Generate(), map, chr->GetPhaseMask(), id, x, y, z, o))
+        if (!creature->Create(map->GenerateLowGuid<HighGuid::Creature>(), map, chr->GetPhaseMask(), id, x, y, z, o))
         {
             delete creature;
             return false;
