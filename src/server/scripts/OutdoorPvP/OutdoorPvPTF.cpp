@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MapManager.h"
 #include "ScriptMgr.h"
 #include "OutdoorPvPTF.h"
 #include "OutdoorPvPMgr.h"
@@ -307,7 +308,7 @@ void OPvPCapturePointTF::ChangeState()
         break;
     }
 
-    GameObject* flag = HashMapHolder<GameObject>::Find(m_capturePointGUID);
+    GameObject* flag = sMapMgr->FindMap(530, 0)->GetGameObject(m_capturePointGUID);
     if (flag)
         flag->SetGoArtKit(artkit);
 

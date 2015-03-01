@@ -185,7 +185,8 @@ void Creature::AddToWorld()
     {
         if (GetZoneScript())
             GetZoneScript()->OnCreatureCreate(this);
-        sObjectAccessor->AddObject(this);
+
+        GetMap()->GetObjectsStore().Insert<Creature>(GetGUID(), this);
         Unit::AddToWorld();
         SearchFormation();
         AIM_Initialize();
@@ -200,10 +201,12 @@ void Creature::RemoveFromWorld()
     {
         if (GetZoneScript())
             GetZoneScript()->OnCreatureRemove(this);
+
         if (m_formation)
             sFormationMgr->RemoveCreatureFromGroup(m_formation, this);
+
         Unit::RemoveFromWorld();
-        sObjectAccessor->RemoveObject(this);
+        GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
     }
 }
 
