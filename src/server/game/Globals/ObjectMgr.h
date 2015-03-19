@@ -1070,6 +1070,8 @@ class ObjectMgr
         uint32 GenerateMailID();
         uint32 GeneratePetNumber();
         uint64 GenerateVoidStorageItemId();
+        uint64 GenerateCreatureSpawnId();
+        uint64 GenerateGameObjectSpawnId();
 
         typedef std::multimap<int32, uint32> ExclusiveQuestGroups;
         typedef std::pair<ExclusiveQuestGroups::const_iterator, ExclusiveQuestGroups::const_iterator> ExclusiveQuestGroupsBounds;
@@ -1205,7 +1207,6 @@ class ObjectMgr
         void RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectData const* data);
         ObjectGuid::LowType AddGOData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0, float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
         ObjectGuid::LowType AddCreData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
-        bool MoveCreData(ObjectGuid::LowType guid, uint32 map, const Position& pos);
 
         // reserved names
         void LoadReservedPlayersNames();
@@ -1355,6 +1356,8 @@ class ObjectMgr
         uint32 _mailId;
         uint32 _hiPetNumber;
         uint64 _voidItemId;
+        uint64 _creatureSpawnId;
+        uint64 _gameObjectSpawnId;
 
         // first free low guid for selected guid type
         template<HighGuid high>
