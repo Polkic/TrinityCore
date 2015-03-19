@@ -179,7 +179,7 @@ public:
             return true;
         }
 
-        guidLow = target->GetDBTableGUIDLow();
+        guidLow = target->GetSpawnId();
 
         PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_ADDON_BY_GUID);
 
@@ -246,7 +246,7 @@ public:
             return true;
         }
 
-        ObjectGuid::LowType guidLow = target->GetDBTableGUIDLow();
+        ObjectGuid::LowType guidLow = target->GetSpawnId();
         if (!guidLow)
         {
             handler->PSendSysMessage("%s%s|r", "|cffff33ff", "Target is not saved to DB.");
@@ -687,7 +687,7 @@ public:
                     wpCreature2->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
                     // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
                     /// @todo Should we first use "Create" then use "LoadFromDB"?
-                    if (!wpCreature2->LoadCreatureFromDB(wpCreature2->GetDBTableGUIDLow(), map))
+                    if (!wpCreature2->LoadCreatureFromDB(wpCreature2->GetSpawnId(), map))
                     {
                         handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
                         delete wpCreature2;
@@ -912,7 +912,7 @@ public:
 
                 wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
                 // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
-                if (!wpCreature->LoadCreatureFromDB(wpCreature->GetDBTableGUIDLow(), map))
+                if (!wpCreature->LoadCreatureFromDB(wpCreature->GetSpawnId(), map))
                 {
                     handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
                     delete wpCreature;
@@ -968,7 +968,7 @@ public:
             creature->CopyPhaseFrom(chr);
 
             creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
-            if (!creature->LoadCreatureFromDB(creature->GetDBTableGUIDLow(), map))
+            if (!creature->LoadCreatureFromDB(creature->GetSpawnId(), map))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
                 delete creature;
@@ -1019,7 +1019,7 @@ public:
             creature->CopyPhaseFrom(chr);
 
             creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMask());
-            if (!creature->LoadCreatureFromDB(creature->GetDBTableGUIDLow(), map))
+            if (!creature->LoadCreatureFromDB(creature->GetSpawnId(), map))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_NOTCREATED, id);
                 delete creature;
