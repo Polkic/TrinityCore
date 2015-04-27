@@ -392,7 +392,7 @@ template<>
 void Map::DeleteFromWorld(Player* player)
 {
     sObjectAccessor->RemoveObject(player);
-    sObjectAccessor->RemoveUpdateObject(player); /// @todo I do not know why we need this, it should be removed in ~Object anyway
+    RemoveUpdateObject(player); /// @todo I do not know why we need this, it should be removed in ~Object anyway
     delete player;
 }
 
@@ -697,6 +697,8 @@ void Map::Update(const uint32 t_diff)
 
         obj->Update(t_diff);
     }
+
+    SendObjectUpdates();
 
     ///- Process necessary scripts
     if (!m_scriptSchedule.empty())
@@ -2589,6 +2591,27 @@ inline void Map::setNGrid(NGridType *grid, uint32 x, uint32 y)
         ASSERT(false);
     }
     i_grids[x][y] = grid;
+}
+
+void Map::SendObjectUpdates()
+{
+    UpdateDataMapType update_players;
+
+    while (!_updateObjects.empty())
+    {
+        Object* obj = *_updateObjects.begin();
+        ASSERT(obj && obj->IsInWorld());
+        _updateObjects.erase(_updateObjects.begin());
+        obj->BuildUpdate(update_players);
+    }
+
+    WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
+    for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
+    {
+        iter->second.BuildPacket(&packet);
+        iter->first->GetSession()->SendPacket(&packet);
+        packet.clear();                                     // clean the string
+    }
 }
 
 void Map::DelayedUpdate(const uint32 t_diff)

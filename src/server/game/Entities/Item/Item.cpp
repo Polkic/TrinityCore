@@ -1168,6 +1168,18 @@ void Item::BuildDynamicValuesUpdate(uint8 updateType, ByteBuffer* data, Player* 
     data->append(fieldBuffer);
 }
 
+void Item::AddToObjectUpdate()
+{
+    if (Player* owner = GetOwner())
+        owner->GetMap()->AddUpdateObject(this);
+}
+
+void Item::RemoveFromObjectUpdate()
+{
+    if (Player* owner = GetOwner())
+        owner->GetMap()->RemoveUpdateObject(this);
+}
+
 void Item::SaveRefundDataToDB()
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();

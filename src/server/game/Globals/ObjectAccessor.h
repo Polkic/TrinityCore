@@ -145,17 +145,6 @@ class ObjectAccessor
         static void SaveAllPlayers();
 
         //non-static functions
-        void AddUpdateObject(Object* obj)
-        {
-            std::lock_guard<std::mutex> lock(_objectLock);
-            i_objects.insert(obj);
-        }
-
-        void RemoveUpdateObject(Object* obj)
-        {
-            std::lock_guard<std::mutex> lock(_objectLock);
-            i_objects.erase(obj);
-        }
 
         //Thread safe
         Corpse* GetCorpseForPlayerGUID(ObjectGuid const& guid);
@@ -165,7 +154,6 @@ class ObjectAccessor
         Corpse* ConvertCorpseForPlayer(ObjectGuid const& player_guid, bool insignia = false);
 
         //Thread unsafe
-        void Update(uint32 diff);
         void RemoveOldCorpses();
         void UnloadAll();
 
@@ -173,10 +161,8 @@ class ObjectAccessor
         typedef std::unordered_map<ObjectGuid, Corpse*> Player2CorpsesMapType;
         typedef std::unordered_map<Player*, UpdateData>::value_type UpdateDataValueType;
 
-        std::set<Object*> i_objects;
         Player2CorpsesMapType i_player2corpse;
 
-        std::mutex _objectLock;
         boost::shared_mutex _corpseLock;
 };
 

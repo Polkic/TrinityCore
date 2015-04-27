@@ -531,6 +531,16 @@ class Map : public GridRefManager<NGridType>
             return GetGuidSequenceGenerator<high>().Generate();
         }
 
+        void AddUpdateObject(Object* obj)
+        {
+            _updateObjects.insert(obj);
+        }
+
+        void RemoveUpdateObject(Object* obj)
+        {
+            _updateObjects.erase(obj);
+        }
+
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);
@@ -584,6 +594,8 @@ class Map : public GridRefManager<NGridType>
         void ScriptsProcess();
 
         void UpdateActiveCells(const float &x, const float &y, const uint32 t_diff);
+
+        void SendObjectUpdates();
 
     protected:
         void SetUnloadReferenceLock(const GridCoord &p, bool on) { getNGrid(p.x_coord, p.y_coord)->setUnloadReferenceLock(on); }
@@ -692,6 +704,8 @@ class Map : public GridRefManager<NGridType>
         MapStoredObjectTypesContainer _objectsStore;
         CreatureBySpawnIdContainer _creatureBySpawnIdStore;
         GameObjectBySpawnIdContainer _gameobjectBySpawnIdStore;
+
+        std::unordered_set<Object*> _updateObjects;
 };
 
 enum InstanceResetMethod
