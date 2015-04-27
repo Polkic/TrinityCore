@@ -1335,7 +1335,7 @@ void Battleground::BuildPvPLogDataPacket(WorldPackets::Battleground::PVPLogData&
         playerData.HealingDone = score.second->HealingDone;
         score.second->BuildObjectivesBlock(playerData.Stats);
 
-        if (Player* player = ObjectAccessor::GetObjectInMap(playerData.PlayerGUID, GetBgMap(), (Player*)nullptr))
+        if (Player* player = ObjectAccessor::GetPlayer(GetBgMap(), playerData.PlayerGUID))
         {
             playerData.IsInWorld = true;
             playerData.PrimaryTalentTree = player->GetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID);

@@ -6710,67 +6710,6 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
     return *(list0.begin()+urand(0, list0.size()-1)) + *(list1.begin()+urand(0, list1.size()-1));
 }
 
-void ObjectMgr::LoadCorpses()
-{
-    uint32 oldMSTime = getMSTime();
-
-    std::unordered_map<uint32, std::list<uint32>> phases;
-
-    //        0       1
-    // SELECT Guid, PhaseId FROM corpse_phases
-    PreparedQueryResult phaseResult = CharacterDatabase.Query(CharacterDatabase.GetPreparedStatement(CHAR_SEL_CORPSE_PHASES));
-    if (phaseResult)
-    {
-        do
-        {
-            Field* fields = phaseResult->Fetch();
-            uint32 guid = fields[0].GetUInt32();
-            uint32 phaseId = fields[1].GetUInt32();
-
-            phases[guid].push_back(phaseId);
-
-        } while (phaseResult->NextRow());
-    }
-
-    //        0     1     2     3            4      5          6          7       8       9      10        11    12          13          14          15
-    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, flags, dynFlags, time, corpseType, instanceId, corpseGuid, guid FROM corpse WHERE corpseType <> 0
-    PreparedQueryResult result = CharacterDatabase.Query(CharacterDatabase.GetPreparedStatement(CHAR_SEL_CORPSES));
-    if (!result)
-    {
-        TC_LOG_INFO("server.loading", ">> Loaded 0 corpses. DB table `corpse` is empty.");
-        return;
-    }
-
-    uint32 count = 0;
-    do
-    {
-        Field* fields = result->Fetch();
-        uint32 guid = fields[14].GetUInt32();
-        CorpseType type = CorpseType(fields[12].GetUInt8());
-        if (type >= MAX_CORPSE_TYPE)
-        {
-            TC_LOG_ERROR("misc", "Corpse (guid: %u) have wrong corpse type (%u), not loading.", guid, type);
-            continue;
-        }
-
-        Corpse* corpse = new Corpse(type);
-        if (!corpse->LoadCorpseFromDB(guid, fields))
-        {
-            delete corpse;
-            continue;
-        }
-
-        for (auto phaseId : phases[guid])
-            corpse->SetInPhase(phaseId, false, true);
-
-        sObjectAccessor->AddCorpse(corpse);
-        ++count;
-    }
-    while (result->NextRow());
-
-    TC_LOG_INFO("server.loading", ">> Loaded %u corpses in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-}
-
 void ObjectMgr::LoadReputationRewardRate()
 {
     uint32 oldMSTime = getMSTime();

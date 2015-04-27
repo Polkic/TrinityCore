@@ -3188,8 +3188,11 @@ void InstanceMap::UnloadAll()
 {
     ASSERT(!HavePlayers());
 
-    if (m_resetAfterUnload == true)
+    if (m_resetAfterUnload)
+    {
         DeleteRespawnTimes();
+        DeleteCorpseData();
+    }
 
     Map::UnloadAll();
 }
@@ -3503,6 +3506,72 @@ time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
     }
 
     return time_t(0);
+}
+
+void Map::LoadCorpseData()
+{
+    std::unordered_map<uint64, std::unordered_set<uint32>> phases;
+
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CORPSE_PHASES);
+    stmt->setUInt32(0, GetId());
+
+    //        0          1
+    // SELECT OwnerGuid, PhaseId FROM corpse_phases cp LEFT JOIN corpse c ON cp.OwnerGuid = c.guid WHERE c.mapId = ?
+    PreparedQueryResult phaseResult = CharacterDatabase.Query(stmt);
+    if (phaseResult)
+    {
+        do
+        {
+            Field* fields = phaseResult->Fetch();
+            uint64 guid = fields[0].GetUInt64();
+            uint32 phaseId = fields[1].GetUInt32();
+
+            phases[guid].insert(phaseId);
+
+        } while (phaseResult->NextRow());
+    }
+
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CORPSES);
+    stmt->setUInt32(0, GetId());
+
+    //        0     1     2     3            4      5          6          7       8       9      10        11    12          13          14
+    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, flags, dynFlags, time, corpseType, instanceId, guid FROM corpse WHERE mapId = ?
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    if (!result)
+        return;
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        CorpseType type = CorpseType(fields[12].GetUInt8());
+        ObjectGuid::LowType guid = fields[14].GetUInt64();
+        if (type >= MAX_CORPSE_TYPE || type == CORPSE_BONES)
+        {
+            TC_LOG_ERROR("misc", "Corpse (guid: " UI64FMTD ") have wrong corpse type (%u), not loading.", guid, type);
+            continue;
+        }
+
+        Corpse* corpse = new Corpse(type);
+        if (!corpse->LoadCorpseFromDB(GenerateLowGuid<HighGuid::Corpse>(), fields))
+        {
+            delete corpse;
+            continue;
+        }
+
+        for (auto phaseId : phases[guid])
+            corpse->SetInPhase(phaseId, false, true);
+
+        sObjectAccessor->AddCorpse(corpse);
+        ++count;
+    } while (result->NextRow());
+}
+
+void Map::DeleteCorpseData()
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSES_FROM_MAP);
+    stmt->setUInt32(0, GetId());
+    CharacterDatabase.Execute(stmt);
 }
 
 void Map::SendZoneDynamicInfo(Player* player)

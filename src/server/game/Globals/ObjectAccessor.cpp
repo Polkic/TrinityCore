@@ -152,13 +152,18 @@ Pet* ObjectAccessor::GetPet(WorldObject const& u, ObjectGuid const& guid)
     return u.GetMap()->GetPet(guid);
 }
 
-Player* ObjectAccessor::GetPlayer(WorldObject const& u, ObjectGuid const& guid)
+Player* ObjectAccessor::GetPlayer(Map const* m, ObjectGuid const& guid)
 {
     if (Player* player = HashMapHolder<Player>::Find(guid))
-        if (player->GetMap() == u.GetMap())
+        if (player->IsInWorld() && player->GetMap() == m)
             return player;
 
     return nullptr;
+}
+
+Player* ObjectAccessor::GetPlayer(WorldObject const& u, ObjectGuid const& guid)
+{
+    return GetPlayer(u.GetMap(), guid);
 }
 
 Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, ObjectGuid const& guid)
@@ -262,7 +267,6 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse)
         }
     }
     else
-
         corpse->RemoveFromWorld();
 
     // Critical section
@@ -361,12 +365,11 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(ObjectGuid const& player_guid, bo
             bones->SetUInt32Value(i, corpse->GetUInt32Value(i));
 
         bones->SetGridCoord(corpse->GetGridCoord());
-        // bones->m_time = m_time;                              // don't overwrite time
-        // bones->m_type = m_type;                              // don't overwrite type
         bones->Relocate(corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetOrientation());
 
         bones->SetUInt32Value(CORPSE_FIELD_FLAGS, CORPSE_FLAG_UNK2 | CORPSE_FLAG_BONES);
         bones->SetGuidValue(CORPSE_FIELD_OWNER, ObjectGuid::Empty);
+        bones->SetGuidValue(OBJECT_FIELD_DATA, corpse->GetGuidValue(OBJECT_FIELD_DATA));
 
         for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
         {

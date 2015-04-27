@@ -119,7 +119,7 @@ void BattlegroundEY::PostUpdateImpl(uint32 diff)
 
 void BattlegroundEY::GetPlayerPositionData(std::vector<WorldPackets::Battleground::BattlegroundPlayerPosition>* positions) const
 {
-    if (Player* player = ObjectAccessor::GetObjectInMap(m_FlagKeeper, GetBgMap(), (Player*)nullptr))
+    if (Player* player = ObjectAccessor::GetPlayer(GetBgMap(), m_FlagKeeper))
     {
         WorldPackets::Battleground::BattlegroundPlayerPosition position;
         position.Guid = player->GetGUID();

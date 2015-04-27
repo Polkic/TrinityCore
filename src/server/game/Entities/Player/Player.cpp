@@ -4560,6 +4560,14 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
             stmt->setUInt64(0, guid);
             trans->Append(stmt);
 
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSE);
+            stmt->setUInt64(0, guid);
+            trans->Append(stmt);
+
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSE_PHASES);
+            stmt->setUInt64(0, guid);
+            trans->Append(stmt);
+
             CharacterDatabase.CommitTransaction(trans);
 
             sWorld->DeleteCharacterInfo(playerguid);

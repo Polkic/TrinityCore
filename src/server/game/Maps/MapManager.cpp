@@ -81,6 +81,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
         {
             map = new Map(id, i_gridCleanUpDelay, 0, DIFFICULTY_NONE);
             map->LoadRespawnTimes();
+            map->LoadCorpseData();
         }
 
         i_maps[id] = map;

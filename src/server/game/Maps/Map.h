@@ -508,6 +508,8 @@ class Map : public GridRefManager<NGridType>
         void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
         void LoadRespawnTimes();
         void DeleteRespawnTimes();
+        void LoadCorpseData();
+        void DeleteCorpseData();
 
         static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);
 

@@ -113,6 +113,7 @@ class ObjectAccessor
         static Unit* GetUnit(WorldObject const&, ObjectGuid const& guid);
         static Creature* GetCreature(WorldObject const& u, ObjectGuid const& guid);
         static Pet* GetPet(WorldObject const&, ObjectGuid const& guid);
+        static Player* GetPlayer(Map const*, ObjectGuid const& guid);
         static Player* GetPlayer(WorldObject const&, ObjectGuid const& guid);
         static Creature* GetCreatureOrPetOrVehicle(WorldObject const&, ObjectGuid const&);
 

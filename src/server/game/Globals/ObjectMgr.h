@@ -1016,7 +1016,6 @@ class ObjectMgr
         void LoadExplorationBaseXP();
         void LoadPetNames();
         void LoadPetNumber();
-        void LoadCorpses();
         void LoadFishingBaseSkillLevel();
 
         void LoadReputationRewardRate();
@@ -1339,7 +1338,7 @@ class ObjectMgr
         }
 
         CharacterTemplateContainer const& GetCharacterTemplates() const { return _characterTemplateStore; }
-        CharacterTemplate const* GetCharacterTemplate(uint32 id) const 
+        CharacterTemplate const* GetCharacterTemplate(uint32 id) const
         {
             auto itr = _characterTemplateStore.find(id);
             if (itr != _characterTemplateStore.end())
